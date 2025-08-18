@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+# GATES: GATK Automated Tool for Exome Sequencing 
+VERSION="1.0.0"
+TOOL_NAME="gates"
+
+# puts conda env path at front of shell search path (necessary for proper use of gnu-getopt)
+export PATH="$CONDA_PREFIX/bin:$PATH"
+
+usage() {
+  cat << EOF
+GATES: GATK Automated Tool for Exome Sequencing
+
+Usage: ${TOOL_NAME} <command> [arguments] [options]
+
+Commands:
+  preprocess   run GATK WES preprocessing pipeline (tumor-only or tumor-normal)
+  call         run GATK WES variant-calling pipeline (tumor-only or tumor-normal)
+
+Run ${TOOL_NAME} <command> --help for command-specific options.
+
+Note: This tool currently only supports hg38/GRCh38 genome builds. 
+EOF
+}
+
+if (( $# < 1 )); then
+  usage
+  exit 1
+fi
+
+# defining first argument passed at CMD
+CMD="$1"; shift
+
+# getting the root directory so that we can call preprocess and call scripts
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+case "$CMD" in
+  preprocess)
+    source "$SCRIPT_DIR/scripts/preprocess.sh"
+    preprocess_main "$@"
+    ;;
+
+  call)
+    source "$SCRIPT_DIR/scripts/call.sh"
+    call_main "$@"
+    ;;
+  
+  --version)
+  echo "${TOOL_NAME} v${VERSION}"
+  exit 0
+  ;; 
+
+  -h|--help)
+    usage
+    exit 0
+    ;;
+
+  *)
+    echo "[ERROR] Unknown command '${CMD}'"
+    echo "Run '${TOOL_NAME} --help' for usage information."
+    usage
+    exit 1
+    ;;
+esac
