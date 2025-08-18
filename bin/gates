@@ -3,7 +3,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 # GATES: GATK Automated Tool for Exome Sequencing 
-VERSION="1.0.0"
+VERSION="0.1.0"
 TOOL_NAME="gates"
 
 # puts conda env path at front of shell search path (necessary for proper use of gnu-getopt)

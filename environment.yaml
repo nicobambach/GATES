@@ -1,0 +1,19 @@
+name: gates
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bash>=4.0
+  - gatk4
+  - bwa
+  - wget
+  - util-linux
+  - gnu-getopt
+  - r-base
+  - r-ggplot2
+  - r-gsalib
+  - r-reshape
+  - r-gplots
+  - grep
+  - samtools
