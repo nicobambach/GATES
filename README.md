@@ -121,20 +121,22 @@ Runs the preprocessing pipeline including alignment, duplicate marking, and BQSR
 - `--verbose`: Show tool outputs in terminal window (note: all tool outputs are captured in time-stamped log files)
 - `--help`: Show usage information
 
-**Arguments:**
-    `-s, --sample-name` <string>      sample identifier [REQUIRED]
-        `--tumor-fq1` <path>          tumor forward FASTQ file [REQUIRED]
-        `--tumor-fq2` <path>          tumor reverse FASTQ file [REQUIRED]
-        `--normal-fq1` <path>         normal forward FASTQ file [REQUIRED if --mode tumor-normal]
-        `--normal-fq2` <path>         normal reverse FASTQ file [REQUIRED if --mode tumor-normal]
-    `-r, --reference` <path>          reference hg38/GRCh38 FASTA file [REQUIRED]
-    `-m, --mode` <string>             mode to run preprocessing. possible values: {tumor-only, tumor-normal} [REQUIRED]
-    `-i, --intervals` <path>          BED/VCF/.interval_list/.list/.intervals file specifying exon capture intervals [REQUIRED]
-    `-t, --threads` <integer>         threads to used in programs that support multithreading [OPTIONAL] [1]    
+```bash
+Arguments: 
+    -s, --sample-name <string>      sample identifier [REQUIRED]
+        --tumor-fq1 <path>          tumor forward FASTQ file [REQUIRED]
+        --tumor-fq2 <path>          tumor reverse FASTQ file [REQUIRED]
+        --normal-fq1 <path>         normal forward FASTQ file [REQUIRED if --mode tumor-normal]
+        --normal-fq2 <path>         normal reverse FASTQ file [REQUIRED if --mode tumor-normal]
+    -r, --reference <path>          reference hg38/GRCh38 FASTA file [REQUIRED]
+    -m, --mode <string>             mode to run preprocessing. possible values: {tumor-only, tumor-normal} [REQUIRED]
+    -i, --intervals <path>          BED/VCF/.interval_list/.list/.intervals file specifying exon capture intervals [REQUIRED]
+    -t, --threads <integer>         threads to used in programs that support multithreading [OPTIONAL] [1]    
 
 Options: 
-`-v, --verbose`                     display tool outputs
-`-h, --help`                         show help message                         
+-v, --verbose                       display tool outputs
+-h, --help                          show help message  
+```
 
 #### `gates call`
 Runs the variant calling pipeline including Mutect2, filtering, and annotation.
