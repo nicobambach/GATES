@@ -106,7 +106,7 @@ gates call \
 #### `gates preprocess`
 Runs the preprocessing pipeline including alignment, duplicate marking, and BQSR.
 
-**Required Arguments:**
+**Arguments:**
 - `--sample-name`: Sample identifier
 - `--tumor-fq1/2`: Paired-end tumor FASTQ files
 - `--reference`: hg38/GRCh38 reference FASTA file
@@ -118,8 +118,23 @@ Runs the preprocessing pipeline including alignment, duplicate marking, and BQSR
 
 **Optional Arguments:**
 - `--threads`: Number of threads (default: 1)
-- `--verbose`: Show detailed tool outputs in terminal window (note: all detailed tool outputs are captured in time-stamped log files)
+- `--verbose`: Show tool outputs in terminal window (note: all tool outputs are captured in time-stamped log files)
 - `--help`: Show usage information
+
+**Arguments:**
+    `-s, --sample-name` <string>      sample identifier [REQUIRED]
+        `--tumor-fq1` <path>          tumor forward FASTQ file [REQUIRED]
+        `--tumor-fq2` <path>          tumor reverse FASTQ file [REQUIRED]
+        `--normal-fq1` <path>         normal forward FASTQ file [REQUIRED if --mode tumor-normal]
+        `--normal-fq2` <path>         normal reverse FASTQ file [REQUIRED if --mode tumor-normal]
+    `-r, --reference` <path>          reference hg38/GRCh38 FASTA file [REQUIRED]
+    `-m, --mode` <string>             mode to run preprocessing. possible values: {tumor-only, tumor-normal} [REQUIRED]
+    `-i, --intervals` <path>          BED/VCF/.interval_list/.list/.intervals file specifying exon capture intervals [REQUIRED]
+    `-t, --threads` <integer>         threads to used in programs that support multithreading [OPTIONAL] [1]    
+
+Options: 
+`-v, --verbose`                     display tool outputs
+`-h, --help`                         show help message                         
 
 #### `gates call`
 Runs the variant calling pipeline including Mutect2, filtering, and annotation.
@@ -137,7 +152,7 @@ Runs the variant calling pipeline including Mutect2, filtering, and annotation.
 **Optional Arguments:**
 - `--keep-all`: Retain all variants, including those that don't pass filtering (not recommended)
 - `--threads`: Number of threads (default: 1)
-- `--verbose`: Show detailed tool outputs in terminal window (note: all detailed tool outputs are captured in time-stamped log files)
+- `--verbose`: Show detailed tool outputs in terminal window (note: all tool outputs are captured in time-stamped log files)
 - `--help`: Show usage information
 
 ## Input Files
@@ -149,8 +164,8 @@ Runs the variant calling pipeline including Mutect2, filtering, and annotation.
 4. Capture interval file: BED file or interval list defining exon capture regions (required)
 
 ### Variant Calling Input
-1. Processed tumor BAM file (required)
-2. Procesed normal BAM file (required for tumor-normal mode)
+1. Processed tumor BAM file (required) (outputted from `gates preprocess`)
+2. Procesed normal BAM file (required for tumor-normal mode) (outputted from `gates preprocess`)
 3. Reference hg38/GRCh38 FASTA file (required)
 4. Capture interval file: BED file or interval list defining exon capture regions (required)
 
