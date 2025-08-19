@@ -17,12 +17,30 @@ mkdir -p "$MUTECT2_SUPPORTING_FILES_DIR" "$MUTECT2_OUTPUT_DIR" "$MUTECT2_FILTERI
 log "Downloading necessary supporting files for Mutect2..."
 
 # getting public panel of normals (PON) from GATK resources
-run_cmd wget -P "$MUTECT2_SUPPORTING_FILES_DIR" https://storage.googleapis.com/gatk-best-practices/somatic-hg38/1000g_pon.hg38.vcf.gz.tbi
-run_cmd wget -P "$MUTECT2_SUPPORTING_FILES_DIR" https://storage.googleapis.com/gatk-best-practices/somatic-hg38/1000g_pon.hg38.vcf.gz
+if [[ ! -f "$MUTECT2_SUPPORTING_FILES_DIR"/1000g_pon.hg38.vcf.gz ]]; then
+    run_cmd wget -P "$MUTECT2_SUPPORTING_FILES_DIR" https://storage.googleapis.com/gatk-best-practices/somatic-hg38/1000g_pon.hg38.vcf.gz
+else
+    log "File exists, skipping: 1000g_pon.hg38.vcf.gz"
+fi
+
+if [[ ! -f "$MUTECT2_SUPPORTING_FILES_DIR"/1000g_pon.hg38.vcf.gz.tbi ]]; then
+    run_cmd wget -P "$MUTECT2_SUPPORTING_FILES_DIR" https://storage.googleapis.com/gatk-best-practices/somatic-hg38/1000g_pon.hg38.vcf.gz.tbi
+else
+    log "File exists, skipping: 1000g_pon.hg38.vcf.gz.tbi"
+fi
 
 # getting annotated germline variants from GATK resoucres
-run_cmd wget -P "$MUTECT2_SUPPORTING_FILES_DIR" https://storage.googleapis.com/gatk-best-practices/somatic-hg38/af-only-gnomad.hg38.vcf.gz
-run_cmd wget -P "$MUTECT2_SUPPORTING_FILES_DIR" https://storage.googleapis.com/gatk-best-practices/somatic-hg38/af-only-gnomad.hg38.vcf.gz.tbi
+if [[ ! -f "$MUTECT2_SUPPORTING_FILES_DIR"/af-only-gnomad.hg38.vcf.gz ]]; then 
+    run_cmd wget -P "$MUTECT2_SUPPORTING_FILES_DIR" https://storage.googleapis.com/gatk-best-practices/somatic-hg38/af-only-gnomad.hg38.vcf.gz
+else 
+    log "File exists, skipping: af-only-gnomad.hg38.vcf.gz"
+fi
+
+if [[ ! -f "$MUTECT2_SUPPORTING_FILES_DIR"/af-only-gnomad.hg38.vcf.gz.tbi ]]; then 
+    run_cmd wget -P "$MUTECT2_SUPPORTING_FILES_DIR" https://storage.googleapis.com/gatk-best-practices/somatic-hg38/af-only-gnomad.hg38.vcf.gz.tbi
+else 
+    log "File exists, skipping: af-only-gnomad.hg38.vcf.gz.tbi"
+fi 
 
 #### RUNNING MUTECT2 IN TUMOR-ONLY MODE ####
 log "Running Mutect2 in tumor-only mode..."
