@@ -24,7 +24,7 @@ Arguments:
     -r, --reference <path>          reference hg38/GRCh38 FASTA file [REQUIRED]
     -m, --mode <string>             mode to run preprocessing. possible values: {tumor-only, tumor-normal} [REQUIRED]
     -i, --intervals <path>          BED/VCF/.interval_list/.list/.intervals file specifying exon capture intervals [REQUIRED]
-    -t, --threads <integer>         threads to used in programs that support multithreading [OPTIONAL] [1]    
+    -t, --threads <integer>         threads to use in programs that support multithreading [OPTIONAL] [1]    
 
 Options: 
 -v, --verbose                       display tool outputs

@@ -1,6 +1,6 @@
 # GATES: GATK Automated Tool for Exome Sequencing
 
-GATES is a lightweight, fully automated pipeline for single-sample somatic whole exome sequencing (WES) analysis. It implements both the GATK data pre-processing and somatic short variant discovery best practices workflow with two simple commands. Built for wet-lab scientists with limited computational resources, GATES runs end-to-end on a standard laptop so basic WES analysis is simple, reproducible, and accessible to everyone.
+GATES is a lightweight, fully automated pipeline for single-sample somatic whole-exome sequencing (WES) analysis. It implements GATK Best Practices for data preprocessing and somatic short-variant discovery with two simple commands. Built for wet-lab scientists with limited computational resources, GATES runs end-to-end on a standard laptop so basic WES analysis is simple, reproducible, and accessible to everyone.
 
 ## Pipeline Overview
 
@@ -10,7 +10,7 @@ GATES is a lightweight, fully automated pipeline for single-sample somatic whole
 3. **Base Quality Score Recalibration (BQSR)**: Recalibration of base quality scores based on known variant sites
 4. **Quality Assessment**: Comprehensive plots comparing base qualities before and after BQSR
 
-### Variant Calling Pipeline
+### Variant Calling
 1. **Somatic Variant Calling**: GATK Mutect2 with publicly available Panel of Normals
 2. **Contamination Estimation**: Cross-sample contamination analysis
 3. **Orientation Bias Modeling**: Read orientation artifact detection
@@ -18,13 +18,15 @@ GATES is a lightweight, fully automated pipeline for single-sample somatic whole
 5. **Variant Annotation**: Variant annotation using GATK Funcotator 
 6. **Output Generation**: Both VCF and tab-delimited table formats
 
+This pipeline only requires input FASTQ files, 
+
 ## Installation
 
 ### Prerequisites
 - [Conda](https://docs.conda.io/en/latest/miniconda.html)
 - Linux or macOS system
-- At least 16GB RAM recommended
-- Sufficient disk space for reference files and output files (~50GB)
+- At least 16 GB RAM recommended
+- Sufficient disk space for reference files and output files (~50 GB)
 
 ### Install from GitHub
 
@@ -72,7 +74,7 @@ gates call \
     --tumor-bam mapped_reads/SAMPLE_ID_sorted_dedup_recal.bam \
     --reference hg38.fa \
     --intervals capture_regions.bed \
-    --mode tumor-only
+    --mode tumor-only \
     --threads 8
 ```
 
@@ -105,23 +107,7 @@ gates call \
 
 #### `gates preprocess`
 Runs the preprocessing pipeline including alignment, duplicate marking, and BQSR.
-
-**Arguments:**
-- `--sample-name`: Sample identifier
-- `--tumor-fq1/2`: Paired-end tumor FASTQ files
-- `--reference`: hg38/GRCh38 reference FASTA file
-- `--intervals`: BED file or interval list for capture regions
-- `--mode`: `tumor-only` or `tumor-normal`
-
-**Tumor-Normal Mode Additional Requirements:**
-- `--normal-fq1/2`: Paired-end normal FASTQ files
-
-**Optional Arguments:**
-- `--threads`: Number of threads (default: 1)
-- `--verbose`: Show tool outputs in terminal window (note: all tool outputs are captured in time-stamped log files)
-- `--help`: Show usage information
-
-```bash
+```
 Arguments: 
     -s, --sample-name <string>      sample identifier [REQUIRED]
         --tumor-fq1 <path>          tumor forward FASTQ file [REQUIRED]
@@ -131,7 +117,7 @@ Arguments:
     -r, --reference <path>          reference hg38/GRCh38 FASTA file [REQUIRED]
     -m, --mode <string>             mode to run preprocessing. possible values: {tumor-only, tumor-normal} [REQUIRED]
     -i, --intervals <path>          BED/VCF/.interval_list/.list/.intervals file specifying exon capture intervals [REQUIRED]
-    -t, --threads <integer>         threads to used in programs that support multithreading [OPTIONAL] [1]    
+    -t, --threads <integer>         threads to use in programs that support multithreading [OPTIONAL] [1]    
 
 Options: 
 -v, --verbose                       display tool outputs
@@ -140,22 +126,21 @@ Options:
 
 #### `gates call`
 Runs the variant calling pipeline including Mutect2, filtering, and annotation.
+```
+Arguments: 
+    -s, --sample-name <string>      sample identifier [REQUIRED]
+        --tumor-bam <path>          sorted, de-duplicated, recalibrated tumor BAM file [REQUIRED]
+        --normal-bam <path>         sorted, de-duplicated, recalibrated normal BAM file [REQUIRED if --mode tumor-normal]
+    -r, --reference <path>          reference FASTA file [REQUIRED]
+    -m, --mode <string>             mode to run variant calling. possible values: {tumor-only, tumor-normal} [REQUIRED]
+    -i, --intervals <path>          BED/VCF/.interval_list/.list/.intervals file specifying exon capture intervals [REQUIRED]
+    -t, --threads <integer>         threads to use in programs that support multithreading [OPTIONAL] [1]    
 
-**Required Arguments:**
-- `--sample-name`: Sample identifier
-- `--tumor-bam`: Preprocessed tumor BAM file (outputted from `gates preprocess`)
-- `--reference`: Reference FASTA file
-- `--intervals`: BED file or interval list for capture regions
-- `--mode`: `tumor-only` or `tumor-normal`
-
-**Tumor-Normal Mode Additional Requirements:**
-- `--normal-bam`: Preprocessed normal BAM file (outputted from `gates preprocess`)
-
-**Optional Arguments:**
-- `--keep-all`: Retain all variants, including those that don't pass filtering (not recommended)
-- `--threads`: Number of threads (default: 1)
-- `--verbose`: Show detailed tool outputs in terminal window (note: all tool outputs are captured in time-stamped log files)
-- `--help`: Show usage information
+Options: 
+-a, --keep-all                       retain all variants, including those that fail filters (not recommended, may increase annotation time)
+-v, --verbose                       display tool outputs
+-h, --help                          show help message   
+```
 
 ## Input Files
 
@@ -166,8 +151,8 @@ Runs the variant calling pipeline including Mutect2, filtering, and annotation.
 4. Capture interval file: BED file or interval list defining exon capture regions (required)
 
 ### Variant Calling Input
-1. Processed tumor BAM file (required) (outputted from `gates preprocess`)
-2. Procesed normal BAM file (required for tumor-normal mode) (outputted from `gates preprocess`)
+1. Processed tumor BAM file (required) (produced by `gates preprocess`)
+2. Processed normal BAM file (required for tumor-normal mode) (produced by `gates preprocess`)
 3. Reference hg38/GRCh38 FASTA file (required)
 4. Capture interval file: BED file or interval list defining exon capture regions (required)
 
@@ -199,7 +184,7 @@ project_directory/
 │   ├── Homo_sapiens_assembly38.dbsnp138.vcf
 │   ├── *.tbi
 │   └── *.idx
-└── *.log
+└── YYYY-MM-DD_HH-MM-SS_gates.log 
 ```
 The most important output files are `*_sorted_dedup_recal.bam`. These fully preprocessed BAMs (sorted, duplicate-marked, and BQSR-adjusted) are now ready for variant calling. Depending on whether `gates` is run in `tumor-only` or `tumor-normal` mode, there will be one or two BAM files. These files will be used as inputs for `gates call`. It is important to keep the `*.bai` files in this same directory as the BAM files as these are needed for downstream tools to properly read the BAM files. These index files are also necessary for viewing the aligned BAM files in IGV. 
 
@@ -223,7 +208,7 @@ project_directory/
 │   └── *.idx
 ├── funcotator_dataSources.v1.8.hg38.*/
 │   └── (annotation databases)
-└── *.log
+└── YYYY-MM-DD_HH-MM-SS_gates.log 
 ```
 The most important output files are `*_variants_filtered_passed_annotated.vcf.gz` and `*_variants_filtered_passed_annotated_table.tsv`. These contain the final high-confidence somatic variants in both VCF format (for downstream analysis) and tab-delimited format (for easy viewing in Excel). The VCF file includes all variant annotations from Funcotator, while the TSV table provides the same information in a more accessible format. The `*_filtering_stats.txt` file provides a summary of how many variants passed or failed each filtering step, which is useful for quality assessment. If the `--keep-all` flag is used, all variants, even those that did not pass filtering, are kept and annotated. In this case, the `*_variants_filtered_passed_annotated.vcf.gz` and `*_variants_filtered_passed_annotated_table.tsv` are instead named `*_variants_filtered_all_annotated.vcf.gz` and `*_variants_filtered_all_annotated_table.tsv`, respectively. Using the `--keep-all` flag is not recommended and will cause increased run times. 
 
@@ -247,15 +232,6 @@ ls *.log
 tail -50 [latest_log_file]
 ```
 
-## Citation
-
-If you use GATES in your research, please cite:
-
-```
-Bambach, NE (2025). GATES: GATK Automated Tool for Exome Sequencing. 
-GitHub. https://github.com/nicobambach/gates
-```
-
 ## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
@@ -265,4 +241,11 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - **Issues**: Report bugs and request features on [GitHub Issues](https://github.com/nicobambach/gates/issues)
 - **Documentation**: Check this README and command help (`gates --help`, `gates preprocess --help`, `gates call --help`)
 
----
+## Citation
+
+If you use GATES in your research, please cite:
+
+```
+Bambach, NE (2025). GATES: GATK Automated Tool for Exome Sequencing. 
+GitHub. https://github.com/nicobambach/gates
+```

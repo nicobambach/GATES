@@ -18,14 +18,14 @@ Usage: ${TOOL_NAME} call [arguments] [options]
 Arguments: 
     -s, --sample-name <string>      sample identifier [REQUIRED]
         --tumor-bam <path>          sorted, de-duplicated, recalibrated tumor BAM file [REQUIRED]
-        --normal-bam <path>         sorted, de-duplicated, recalibrated normal BAM file [REQUIRED]
+        --normal-bam <path>         sorted, de-duplicated, recalibrated normal BAM file [REQUIRED if --mode tumor-normal]
     -r, --reference <path>          reference FASTA file [REQUIRED]
-    -m, --mode <string>             mode to run preprocessing. possible values: {tumor-only, tumor-normal} [REQUIRED]
+    -m, --mode <string>             mode to run variant calling. possible values: {tumor-only, tumor-normal} [REQUIRED]
     -i, --intervals <path>          BED/VCF/.interval_list/.list/.intervals file specifying exon capture intervals [REQUIRED]
-    -t, --threads <integer>         threads to used in programs that support multithreading [OPTIONAL] [1]    
+    -t, --threads <integer>         threads to use in programs that support multithreading [OPTIONAL] [1]    
 
 Options: 
--a --keep-all                       retain all variants, including those that fail filters (not recommended, may increase annotation time)
+-a, --keep-all                       retain all variants, including those that fail filters (not recommended, may increase annotation time)
 -v, --verbose                       display tool outputs
 -h, --help                          show help message                        
 EOF
