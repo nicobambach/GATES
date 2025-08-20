@@ -73,7 +73,7 @@ run_cmd gatk GetPileupSummaries \
 run_cmd gatk GetPileupSummaries \
     -I $NORMAL_BAM \
     -V $MUTECT2_SUPPORTING_FILES_DIR/af-only-gnomad.hg38.vcf.gz \
-    -L $MUTECT2_SUPPORTING_FILES_DIR/af-only-gnomad.hg38.vcf.gzT \
+    -L $MUTECT2_SUPPORTING_FILES_DIR/af-only-gnomad.hg38.vcf.gz \
     -O ${MUTECT2_FILTERING_DIR}/${SAMPLE_NAME}_NORMAL_pileups_summary.table
 
 # running CalculateContamination with 
