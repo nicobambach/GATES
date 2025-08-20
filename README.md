@@ -18,7 +18,7 @@ GATES is a lightweight, fully automated pipeline for single-sample somatic whole
 5. **Variant Annotation**: Variant annotation using GATK Funcotator 
 6. **Output Generation**: Both VCF and tab-delimited table formats
 
-This pipeline only requires input FASTQ files, 
+This pipeline only requires input FASTQ files, a reference FASTA, and capture intervals. All other resources are downloaded automatically.
 
 ## Installation
 
@@ -32,8 +32,8 @@ This pipeline only requires input FASTQ files,
 
 1. **Clone this repository**:
 ```bash
-git clone https://github.com/nicobambach/gates.git
-cd gates
+git clone https://github.com/nicobambach/GATES.git
+cd GATES
 ```
 
 2. **Create and activate conda environment**:
@@ -210,7 +210,7 @@ project_directory/
 │   └── (annotation databases)
 └── YYYY-MM-DD_HH-MM-SS_gates.log 
 ```
-The most important output files are `*_variants_filtered_passed_annotated.vcf.gz` and `*_variants_filtered_passed_annotated_table.tsv`. These contain the final high-confidence somatic variants in both VCF format (for downstream analysis) and tab-delimited format (for easy viewing in Excel). The VCF file includes all variant annotations from Funcotator, while the TSV table provides the same information in a more accessible format. The `*_filtering_stats.txt` file provides a summary of how many variants passed or failed each filtering step, which is useful for quality assessment. If the `--keep-all` flag is used, all variants, even those that did not pass filtering, are kept and annotated. In this case, the `*_variants_filtered_passed_annotated.vcf.gz` and `*_variants_filtered_passed_annotated_table.tsv` are instead named `*_variants_filtered_all_annotated.vcf.gz` and `*_variants_filtered_all_annotated_table.tsv`, respectively. Using the `--keep-all` flag is not recommended and will cause increased run times. 
+The most important output files are `*_variants_filtered_passed_annotated.vcf.gz` and `*_variants_filtered_passed_annotated_table.tsv`. These contain the final high-confidence somatic variants in both VCF format (for downstream analysis) and tab-delimited format (for easy viewing in Excel). The VCF file includes all variant annotations from Funcotator, while the TSV table provides the same information in a more accessible format. The `*_filtering_stats.txt` file provides a summary of how many variants passed or failed each filtering step, which is useful for quality assessment. If the `--keep-all` flag is used, all variants, even those that did not pass filtering, are kept and annotated. In this case, the output VCF and table files will include `filtered_all_annotated` as opposed to `filtered_passed_annotated`. Using the `--keep-all` flag is not recommended as it will retain low-confidence variant calls and will also increase runtime. 
 
 ## Dependencies
 
@@ -229,7 +229,7 @@ All dependencies are automatically managed through conda via the environment.yam
 GATES creates timestamped log files for each run. Check these for detailed error messages:
 ```bash
 ls *.log
-tail -50 [latest_log_file]
+tail -50 YYYY-MM-DD_HH-MM-SS_gates.log
 ```
 
 ## License
