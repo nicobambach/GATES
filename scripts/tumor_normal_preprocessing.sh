@@ -141,6 +141,8 @@ run_cmd gatk BaseRecalibrator \
 run_cmd gatk ApplyBQSR \
        -I ${MAPPED_READS_DIR}/${SAMPLE_NAME}_tumor_sorted_dedup.bam  \
        -R $REFERENCE \
+       --interval-padding 100 \
+       --intervals $INTERVAL_LIST \
        --bqsr-recal-file ${BQSR_OUT_DIR}/${SAMPLE_NAME}_tumor_recalibration_table.table \
        -O ${MAPPED_READS_DIR}/${SAMPLE_NAME}_tumor_sorted_dedup_recal.bam 
 
@@ -168,6 +170,8 @@ run_cmd gatk BaseRecalibrator \
 run_cmd gatk ApplyBQSR \
        -I ${MAPPED_READS_DIR}/${SAMPLE_NAME}_normal_sorted_dedup.bam  \
        -R $REFERENCE \
+       --interval-padding 100 \
+       --intervals $INTERVAL_LIST \
        --bqsr-recal-file ${BQSR_OUT_DIR}/${SAMPLE_NAME}_normal_recalibration_table.table \
        -O ${MAPPED_READS_DIR}/${SAMPLE_NAME}_normal_sorted_dedup_recal.bam 
 
