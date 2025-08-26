@@ -57,11 +57,26 @@ run_cmd gatk Mutect2 \
 
 #### ESTIMATING CROSS-SAMPLE CONTAMINATION ####
 log "Estimating cross-sample contamination..."
+log "Downloading common SNP reference VCF file..."
 
+if [[ ! -f "$MUTECT2_SUPPORTING_FILES_DIR"/small_exac_common_3.hg38.vcf.gz ]]; then
+    run_cmd wget -P "$MUTECT2_SUPPORTING_FILES_DIR" https://storage.googleapis.com/gatk-best-practices/somatic-hg38/small_exac_common_3.hg38.vcf.gz
+else
+    log "File exists, skipping: small_exac_common_3.hg38.vcf.gz"
+fi
+
+if [[ ! -f "$MUTECT2_SUPPORTING_FILES_DIR"/small_exac_common_3.hg38.vcf.gz.tbi ]]; then
+    run_cmd wget -P "$MUTECT2_SUPPORTING_FILES_DIR" https://storage.googleapis.com/gatk-best-practices/somatic-hg38/small_exac_common_3.hg38.vcf.gz.tbi
+else
+    log "File exists, skipping: small_exac_common_3.hg38.vcf.gz.tbi"
+fi
+
+# getting pileups at common SNP sites
 run_cmd gatk GetPileupSummaries \
     -I $TUMOR_BAM \
-    -V $MUTECT2_SUPPORTING_FILES_DIR/af-only-gnomad.hg38.vcf.gz \
-    -L $MUTECT2_SUPPORTING_FILES_DIR/af-only-gnomad.hg38.vcf.gz \
+    -V $MUTECT2_SUPPORTING_FILES_DIR/small_exac_common_3.hg38.vcf.gz \
+    -L $MUTECT2_SUPPORTING_FILES_DIR/small_exac_common_3.hg38.vcf.gz \
+    -L $INTERVAL_LIST \
     -O ${MUTECT2_FILTERING_DIR}/${SAMPLE_NAME}_pileups_summary.table
 
 run_cmd gatk CalculateContamination \
