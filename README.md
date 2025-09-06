@@ -1,5 +1,4 @@
 # GATES: GATK Automated Tool for Exome Sequencing
-Version 1.1.0
 
 GATES is a package for fully automated single-sample whole-exome sequencing (WES) analysis. It implements GATK Best Practices through a simplified command-line interface, supporting both somatic and germline variant discovery. Built for researchers without extensive computational expertise, GATES is lightweight and runs end-to-end on a standard laptop. From raw FASTQ files to filtered variants, GATES makes WES analysis accessible, reproducible, and reliable.
 
