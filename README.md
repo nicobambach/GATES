@@ -1,6 +1,7 @@
 # GATES: GATK Automated Tool for Exome Sequencing
+Version 1.1.0
 
-GATES is a package for fully automates single-sample whole-exome sequencing (WES) analysis. It implements GATK Best Practices through a simplified command-line interface, supporting both somatic and germline variant discovery. Built for researchers without extensive computational expertise, GATES is lightweight and runs end-to-end on a standard laptop. From raw FASTQ files to filtered variants, GATES makes WES analysis accessible, reproducible, and reliable.
+GATES is a package for fully automated single-sample whole-exome sequencing (WES) analysis. It implements GATK Best Practices through a simplified command-line interface, supporting both somatic and germline variant discovery. Built for researchers without extensive computational expertise, GATES is lightweight and runs end-to-end on a standard laptop. From raw FASTQ files to filtered variants, GATES makes WES analysis accessible, reproducible, and reliable.
 
 ## Package Overview
 
@@ -16,13 +17,13 @@ GATES supports comprehensive WES variant calling and filtering with a single com
    - Somatic variant calling on non-paired tumor sample using Mutect2
    - Automatically downloads and utilizes public panel of normals to identify technical artifacts
    - Automatically downloads and utilizes germline resource to exclude common germline variants
-   - Estimates contamination and read orientation bias modling for variant filtering
+   - Estimates contamination and read orientation bias modeling for variant filtering
   
 2. **Tumor-Normal Somatic Variant Calling**
    - Somatic variant calling with tumor sample and paired-normal using Mutect2
    - Automatically downloads and utilizes public panel of normals to identify technical artifacts
    - Automatically downloads and utilizes germline resource to exclude common germline variants
-   - Estimates contamination and read orientation bias modling for variant filtering
+   - Estimates contamination and read orientation bias modeling for variant filtering
 
 3. **Germline Variant Calling**
    - Germline variant calling using HaplotypeCaller
@@ -232,7 +233,7 @@ project_directory/
 ```
 `gates call` generates files containing variants called by either Mutect2 (somatic) or HaplotypeCaller (germline) in the VCF file format. The output folder is named based on analysis mode (`germline/`, `tumor_only_somatic/`, or `tumor_normal_somatic/`) and VCF file names include whether called variants are germline or somatic. 
 
-Variants are automatically filtered based on GATK-recommended paramteres for germline and somatic variant discovery. `SAMPLE_NAME_passed_*_variants.vcf.gz` contains only variants that passed filtering, representing high-confidence calls. `SAMPLE_NAME_all_*_variants.vcf.gz` includes both passing and non-passing variants with the `FILTER` field annotated based on which filtering criteria each variant did not pass. This file may be useful for quality control, however, it is recommended to use only passing variants for downstream analysis. 
+Variants are automatically filtered based on GATK-recommended parameters for germline and somatic variant discovery. `SAMPLE_NAME_passed_*_variants.vcf.gz` contains only variants that passed filtering, representing high-confidence calls. `SAMPLE_NAME_all_*_variants.vcf.gz` includes both passing and non-passing variants with the `FILTER` field annotated based on which filtering criteria each variant did not pass. This file may be useful for quality control, however, it is recommended to use only passing variants for downstream analysis. 
 
 ## Dependencies
 
@@ -268,6 +269,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 If you use GATES in your research, please cite:
 
 ```
-Bambach, NE (2025). GATES: GATK Automated Tool for Exome Sequencing. 
+Bambach, NE (2025). GATES: GATK Automated Tool for Exome Sequencing v1.1.0. 
 GitHub. https://github.com/nicobambach/gates
 ```
