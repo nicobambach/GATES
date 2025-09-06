@@ -10,6 +10,13 @@ source "$SCRIPT_DIR/scripts/helper.sh"
 
 tumor_normal_variant_calling_workflow() {
 
+# setting directories
+SUPPORTING_FILES_DIR="./supporting_files"
+MUTECT2_SUPPORTING_FILES_DIR="$SUPPORTING_FILES_DIR/calling_resources"
+ANALYSIS_DIR="./tumor_normal_somatic"
+MUTECT2_OUTPUT_DIR="$ANALYSIS_DIR/variants"
+MUTECT2_FILTERING_DIR="$ANALYSIS_DIR/filtering_data"
+
 # making necessary directories
 mkdir -p "$MUTECT2_SUPPORTING_FILES_DIR" "$MUTECT2_OUTPUT_DIR" "$MUTECT2_FILTERING_DIR"
 
@@ -56,9 +63,10 @@ run_cmd gatk Mutect2 \
     --intervals $INTERVAL_LIST \
     --interval-padding 100 \
     --f1r2-tar-gz ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_f1r2.tar.gz \
+    --native-pair-hmm-threads $THREADS \
     -O ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_variants.vcf.gz
 
- #### ESTIMATING CROSS-SAMPLE CONTAMINATION ####
+#### ESTIMATING CROSS-SAMPLE CONTAMINATION ####
 log "Estimating cross-sample contamination..."
 log "Downloading common SNP reference VCF file..."
 
@@ -114,58 +122,31 @@ run_cmd gatk FilterMutectCalls \
     --tumor-segmentation ${MUTECT2_FILTERING_DIR}/${SAMPLE_NAME}_tumor_segmentation_table.table \
     --orientation-bias-artifact-priors ${MUTECT2_FILTERING_DIR}/${SAMPLE_NAME}_read_orientation_model.tar.gz \
     --filtering-stats ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_filtering_stats.txt \
-    -O ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_variants_filtered.vcf.gz
+    -O ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_all_somatic_variants.vcf.gz
 
+# removing non-filtered VCF files
 rm -f ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_variants.vcf.gz  
 rm -f ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_variants.vcf.gz.tbi
 rm -f ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_variants.vcf.gz.stats
 
-if [[ ${KEEP_ALL} -eq 0 ]]; then
-    log "Selecting only variants that passed filtering..."
-    run_cmd gatk SelectVariants \
-        -V ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_variants_filtered.vcf.gz \
-        --exclude-filtered true \
-        -O ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_variants_filtered_passed.vcf.gz
-fi
+log "Selecting only variants that passed filtering..."
+run_cmd gatk SelectVariants \
+    -V ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_all_somatic_variants.vcf.gz \
+    --exclude-filtered true \
+    -O ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_passed_somatic_variants.vcf.gz
 
-#### DOWNLOADING FUNCOTATOR DATA SOURCES #####
-log "Downloading variant annotation data..."
-run_cmd gatk FuncotatorDataSourceDownloader \
-    --somatic \
-    --validate-integrity \
-    --extract-after-download \
-    --${GENOME_VERS}
+#### FINAL STATISTICS ####
+ALL_VARIANTS=$(bcftools view -H ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_all_somatic_variants.vcf.gz | wc -l)
+PASSED_VARIANTS=$(bcftools view -H ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_passed_somatic_variants.vcf.gz | wc -l)
+FILTERED_OUT=$((ALL_VARIANTS - PASSED_VARIANTS))
+PASS_PERCENT=$(( (PASSED_VARIANTS * 100) / ALL_VARIANTS ))
 
-#### ANNOTATING DATA WITH FUNCOTATOR ####
-log "Annotating variants..."
-
-# setting variables to handle different genome versions and whether or not passing variants were selected
-FUNCOTATOR_DATA_PATH="./funcotator_dataSources.v1.8.${GENOME_VERS}.20230908s"
-
-if [[ ${KEEP_ALL} -eq 0 ]]; then 
-    VCF_IN=${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_variants_filtered_passed.vcf.gz
-    SUFFIX="passed"
-else 
-    VCF_IN=${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_variants_filtered.vcf.gz
-    SUFFIX="all"
-fi
-
-OUT_VCF=${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_variants_filtered_${SUFFIX}_annotated.vcf.gz
-
-run_cmd gatk Funcotator \
-    --variant $VCF_IN \
-    --reference $REFERENCE \
-    --ref-version $GENOME_VERS \
-    --data-sources-path $FUNCOTATOR_DATA_PATH \
-    --output $OUT_VCF \
-    --output-file-format VCF
-
-#### CONVERTING VCF TO TABLE ####
-log "Converting VCF to table..."
-
-run_cmd gatk VariantsToTable \
-    -V $OUT_VCF \
-    -F CHROM -F POS -F REF -F ALT -F TYPE -F DP -F FUNCOTATION -GF AF -GF GT -GF FAD \
-    -O ${MUTECT2_OUTPUT_DIR}/${SAMPLE_NAME}_variants_filtered_${SUFFIX}_annotated_table.tsv
+log "Tumor-normal somatic variant calling complete."
+log "Total variants found: ${ALL_VARIANTS}"
+log "Variants filtered out: ${FILTERED_OUT}"
+log "Variants that passed filtering: ${PASSED_VARIANTS} (${PASS_PERCENT}%)"
+log "Variant output files:"
+log "  - ${SAMPLE_NAME}_all_somatic_variants.vcf.gz (all variants)"
+log "  - ${SAMPLE_NAME}_passed_somatic_variants.vcf.gz (variants that passed filtering)"
 
 }

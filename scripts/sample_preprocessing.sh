@@ -6,7 +6,14 @@ IFS=$'\n\t'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$SCRIPT_DIR/scripts/helper.sh"
 
-tumor_only_preprocess_workflow() {
+preprocess_workflow() {
+
+# setting directories
+SUPPORTING_FILES_DIR="./supporting_files"
+PREPROCESSING_DIR="./preprocessing"
+BQSR_DB_DIR="$SUPPORTING_FILES_DIR/preprocessing_resources"
+BQSR_OUT_DIR="$PREPROCESSING_DIR/bqsr_output"
+MAPPED_READS_DIR="$PREPROCESSING_DIR/mapped_reads"
     
 # making necessary directories
 mkdir -p "$BQSR_DB_DIR" "$BQSR_OUT_DIR" "$MAPPED_READS_DIR"
@@ -20,23 +27,23 @@ else
 fi
 
 log "Aligning reads to reference..."
-align_tumor_only (){
+align_sample (){
     bwa mem \
     -R "@RG\tID:"$SAMPLE_NAME"\tPL:ILLUMINA\tSM:${SAMPLE_NAME}" \
     -t $THREADS \
     $REFERENCE \
-    $TUMOR_FQ1 \
-    $TUMOR_FQ2 \
+    $FQ1 \
+    $FQ2 \
     | samtools view -Sb - > ${MAPPED_READS_DIR}/${SAMPLE_NAME}.bam
 }
 
-run_cmd align_tumor_only
+run_cmd align_sample
 
 #### MARKING DUPLICATES AND SORTING ####
 log "Marking duplicates and sorting..."
 run_cmd gatk MarkDuplicatesSpark \
             -I ${MAPPED_READS_DIR}/${SAMPLE_NAME}.bam \
-            -O ${MAPPED_READS_DIR}/${SAMPLE_NAME}_sorted_dedup.bam
+            -O ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.bam
 
 # removing unsorted bam file to save space
 rm ${MAPPED_READS_DIR}/${SAMPLE_NAME}.bam  
@@ -105,43 +112,27 @@ log "Running BQSR..."
 
 # running first pass (training)
 run_cmd gatk BaseRecalibrator \
-            -I ${MAPPED_READS_DIR}/${SAMPLE_NAME}_sorted_dedup.bam \
+            -I ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.bam \
             -R $REFERENCE \
             --known-sites $BQSR_DB_DIR/Homo_sapiens_assembly38.dbsnp138.vcf \
             --known-sites $BQSR_DB_DIR/Homo_sapiens_assembly38.known_indels.vcf.gz \
             --known-sites $BQSR_DB_DIR/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz \
             --interval-padding 100 \
             --intervals $INTERVAL_LIST \
-            -O ${BQSR_OUT_DIR}/${SAMPLE_NAME}_recalibration_table.table
+            -O ${BQSR_OUT_DIR}/${SAMPLE_NAME}_recal_tbl.table
 
 # running second step (recalibrating)
 run_cmd gatk ApplyBQSR \
-            -I ${MAPPED_READS_DIR}/${SAMPLE_NAME}_sorted_dedup.bam  \
+            -I ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.bam  \
             -R $REFERENCE \
             --interval-padding 100 \
             --intervals $INTERVAL_LIST \
-            --bqsr-recal-file ${BQSR_OUT_DIR}/${SAMPLE_NAME}_recalibration_table.table \
-            -O ${MAPPED_READS_DIR}/${SAMPLE_NAME}_sorted_dedup_recal.bam 
+            --bqsr-recal-file ${BQSR_OUT_DIR}/${SAMPLE_NAME}_recal_tbl.table \
+            -O ${MAPPED_READS_DIR}/${SAMPLE_NAME}_recal.bam 
 
-# running first pass again to be able to compare effect of bqsr
-run_cmd gatk BaseRecalibrator \
-            -I ${MAPPED_READS_DIR}/${SAMPLE_NAME}_sorted_dedup_recal.bam \
-            -R $REFERENCE \
-            --known-sites $BQSR_DB_DIR/Homo_sapiens_assembly38.dbsnp138.vcf \
-            --known-sites $BQSR_DB_DIR/Homo_sapiens_assembly38.known_indels.vcf.gz \
-            --known-sites $BQSR_DB_DIR/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz \
-            --interval-padding 100 \
-            --intervals $INTERVAL_LIST \
-            -O ${BQSR_OUT_DIR}/${SAMPLE_NAME}_post_recalibration_table.table
+# removing non-recalibrated bam file to save space 
+run_cmd rm -f ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.bam
 
-# analyzing effects of bqsr on base scoring
-run_cmd gatk AnalyzeCovariates \
-            -before ${BQSR_OUT_DIR}/${SAMPLE_NAME}_recalibration_table.table \
-            -after ${BQSR_OUT_DIR}/${SAMPLE_NAME}_post_recalibration_table.table \
-            -plots ${BQSR_OUT_DIR}/${SAMPLE_NAME}_recalibration_plots.pdf
-
-# removing bqsr data and non-recalibrated bam file to save space 
-run_cmd rm -rf "$BQSR_DB_DIR"
-run_cmd rm -f ${MAPPED_READS_DIR}/${SAMPLE_NAME}_sorted_dedup.bam
+log "Preprocessing complete. Final BAM: ${MAPPED_READS_DIR}/${SAMPLE_NAME}_recal.bam"
 
 }

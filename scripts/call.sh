@@ -9,6 +9,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$SCRIPT_DIR/scripts/helper.sh"
 source "$SCRIPT_DIR/scripts/tumor_only_calling.sh"
 source "$SCRIPT_DIR/scripts/tumor_normal_calling.sh"
+source "$SCRIPT_DIR/scripts/germline_calling.sh"
 
 # function to define preprocess specific command usage
 usage() {
@@ -17,17 +18,16 @@ Usage: ${TOOL_NAME} call [arguments] [options]
 
 Arguments: 
     -s, --sample-name <string>      sample identifier [REQUIRED]
-        --tumor-bam <path>          sorted, de-duplicated, recalibrated tumor BAM file [REQUIRED]
-        --normal-bam <path>         sorted, de-duplicated, recalibrated normal BAM file [REQUIRED if --mode tumor-normal]
+        --tumor-bam <path>          preprocessed tumor BAM file [REQUIRED]
+        --normal-bam <path>         preprocessed normal BAM file [REQUIRED if --mode tumor-normal]
     -r, --reference <path>          reference FASTA file [REQUIRED]
-    -m, --mode <string>             mode to run variant calling. possible values: {tumor-only, tumor-normal} [REQUIRED]
+    -m, --mode <string>             mode to run variant calling. possible values: {tumor-only, tumor-normal, germline} [REQUIRED]
     -i, --intervals <path>          BED/VCF/.interval_list/.list/.intervals file specifying exon capture intervals [REQUIRED]
     -t, --threads <integer>         threads to use in programs that support multithreading [OPTIONAL] [1]    
 
 Options: 
--a, --keep-all                       retain all variants, including those that fail filters (not recommended, may increase annotation time)
--v, --verbose                       display tool outputs
--h, --help                          show help message                        
+    -v, --verbose                   display tool outputs
+    -h, --help                      show help message                        
 EOF
 }
 
@@ -37,19 +37,14 @@ VERBOSE=0
 SAMPLE_NAME=""
 TUMOR_BAM=""
 NORMAL_BAM=""
-KEEP_ALL=0
 MODE=""
 GENOME_VERS="hg38"
 THREADS=1
 REFERENCE=""
-MUTECT2_SUPPORTING_FILES_DIR=./mutect2_supporting_files
-MUTECT2_OUTPUT_DIR=./mutect2_output
-MUTECT2_FILTERING_DIR=./mutect2_filtering_data
-MAPPED_READS_DIR="./mapped_reads"
 INTERVAL_LIST=""
 
 # parse arguments
-OPTS=$(getopt -o s:t:i:m:r:avh --long sample-name:,tumor-bam:,normal-bam:,threads:,intervals:,mode:,reference:,keep-all,verbose,help -n "$0" -- "$@") || exit 1
+OPTS=$(getopt -o s:t:i:m:r:vh --long sample-name:,tumor-bam:,normal-bam:,threads:,intervals:,mode:,reference:,verbose,help -n "$0" -- "$@") || exit 1
 eval set -- "$OPTS"
 
 # setting variables based on inputted arguments
@@ -62,7 +57,6 @@ while true; do
     -m | --mode) MODE="$2"; shift 2 ;;
     -t | --threads) THREADS="$2"; shift 2 ;;
     -i | --intervals) INTERVAL_LIST="$2"; shift 2 ;;
-    -a | --keep-all) KEEP_ALL=1; shift;;
     -v | --verbose) VERBOSE=1; shift ;;
     -h | --help) usage; exit 0 ;;
     --) shift; break ;;
@@ -73,8 +67,8 @@ done
 #### Creating errors if required inputs are not present ####
 
 # --mode
-if [[ "$MODE" != "tumor-only" && "$MODE" != "tumor-normal" ]]; then
-    echo "[ERROR] must specify either --mode tumor-only or --mode tumor-normal"
+if [[ "$MODE" != "tumor-only" && "$MODE" != "tumor-normal" && "$MODE" != "germline" ]]; then
+    echo "[ERROR] must specify either --mode tumor-only, --mode tumor-normal or --mode germline"
     exit 1
 fi
 
@@ -113,11 +107,13 @@ fi
 # setting start 
 SECONDS=0
 
-# running either tumor-only or tumor-normal variant calling by calling functions from sources scripts
+# running either tumor-only, tumor-normal, or germline variant calling by calling functions from sourced scripts
 if [[ "$MODE" == "tumor-only" ]]; then
     tumor_only_variant_calling_workflow
-  else
+elif [[ "$MODE" == "tumor-normal" ]]; then
     tumor_normal_variant_calling_workflow
+elif [[ "$MODE" == "germline" ]]; then
+    germline_variant_calling_workflow
 fi
 
 # getting elapsed time
