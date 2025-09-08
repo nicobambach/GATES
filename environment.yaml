@@ -17,3 +17,4 @@ dependencies:
   - r-gplots
   - grep
   - samtools
+  - bcftools
