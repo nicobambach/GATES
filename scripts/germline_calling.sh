@@ -18,6 +18,11 @@ REALIGNED_READS_DIR="$ANALYSIS_DIR/realigned_reads"
 # making necessary directories
 mkdir -p "$HAPLOTYPECALLER_OUTPUT_DIR" "$REALIGNED_READS_DIR"
 
+# getting sample name from BAM header
+SAMPLE_NAME=$(samtools samples $TUMOR_BAM | cut -f1)
+
+log "Beginning germline variant calling for $SAMPLE_NAME"
+
 #### RUNNING HAPLOTYPECALLER ####
 log "Running HaplotypeCaller..."
 run_cmd gatk HaplotypeCaller \
@@ -44,6 +49,9 @@ run_cmd gatk SelectVariants \
     -V ${HAPLOTYPECALLER_OUTPUT_DIR}/${SAMPLE_NAME}_variants.vcf.gz \
     -select-type INDEL \
     -O ${HAPLOTYPECALLER_OUTPUT_DIR}/${SAMPLE_NAME}_indels.vcf.gz
+
+# removing non-filtered combined VCF
+rm -f ${HAPLOTYPECALLER_OUTPUT_DIR}/${SAMPLE_NAME}_variants.vcf.gz
 
 #### APPLYING HARD FILTERING TO SNP and INDEL VCF FILES ####
 log "Applying standard hard-filters for SNPs and INDELs..."
@@ -107,7 +115,7 @@ PASSED_VARIANTS=$(bcftools view -H ${HAPLOTYPECALLER_OUTPUT_DIR}/${SAMPLE_NAME}_
 FILTERED_OUT=$((ALL_VARIANTS - PASSED_VARIANTS))
 PASS_PERCENT=$(( (PASSED_VARIANTS * 100) / ALL_VARIANTS ))
 
-log "Germline variant calling complete."
+log "Finished germline variant calling for $SAMPLE_NAME"
 log "Total variants found: ${ALL_VARIANTS}"
 log "Variants filtered out: ${FILTERED_OUT}"
 log "Variants that passed filtering: ${PASSED_VARIANTS} (${PASS_PERCENT}%)"

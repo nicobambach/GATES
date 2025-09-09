@@ -17,7 +17,6 @@ usage() {
 Usage: ${TOOL_NAME} call [arguments] [options]
 
 Arguments: 
-    -s, --sample-name <string>      sample identifier [REQUIRED]
         --tumor-bam <path>          preprocessed tumor BAM file [REQUIRED]
         --normal-bam <path>         preprocessed normal BAM file [REQUIRED if --mode tumor-normal]
     -r, --reference <path>          reference FASTA file [REQUIRED]
@@ -34,7 +33,6 @@ EOF
 call_main() {
 # initializing variables
 VERBOSE=0
-SAMPLE_NAME=""
 TUMOR_BAM=""
 NORMAL_BAM=""
 MODE=""
@@ -44,13 +42,12 @@ REFERENCE=""
 INTERVAL_LIST=""
 
 # parse arguments
-OPTS=$(getopt -o s:t:i:m:r:vh --long sample-name:,tumor-bam:,normal-bam:,threads:,intervals:,mode:,reference:,verbose,help -n "$0" -- "$@") || exit 1
+OPTS=$(getopt -o t:i:m:r:vh --long tumor-bam:,normal-bam:,threads:,intervals:,mode:,reference:,verbose,help -n "$0" -- "$@") || exit 1
 eval set -- "$OPTS"
 
 # setting variables based on inputted arguments
 while true; do
   case "$1" in
-    -s | --sample-name) SAMPLE_NAME="$2"; shift 2 ;;
     --tumor-bam) TUMOR_BAM="$2"; shift 2 ;;
     --normal-bam) NORMAL_BAM="$2"; shift 2 ;;
     -r | --reference) REFERENCE="$2"; shift 2 ;;
@@ -70,12 +67,6 @@ done
 if [[ "$MODE" != "tumor-only" && "$MODE" != "tumor-normal" && "$MODE" != "germline" ]]; then
     echo "[ERROR] must specify either --mode tumor-only, --mode tumor-normal or --mode germline"
     exit 1
-fi
-
-# --sample-name 
-if [[ -z "$SAMPLE_NAME" ]]; then 
-  echo "[ERROR] --sample-name is required"
-  exit 1
 fi
 
 # --reference

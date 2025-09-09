@@ -14,6 +14,8 @@ PREPROCESSING_DIR="./preprocessing"
 BQSR_DB_DIR="$SUPPORTING_FILES_DIR/preprocessing_resources"
 BQSR_OUT_DIR="$PREPROCESSING_DIR/bqsr_output"
 MAPPED_READS_DIR="$PREPROCESSING_DIR/mapped_reads"
+
+log "Starting preprocessing for $SAMPLE_NAME"
     
 # making necessary directories
 mkdir -p "$BQSR_DB_DIR" "$BQSR_OUT_DIR" "$MAPPED_READS_DIR"
@@ -55,43 +57,43 @@ log "Downloading data for Base Quality Score Recalibration (BQSR)..."
 if [[ ! -f "$BQSR_DB_DIR/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz" ]]; then
     run_cmd wget -P "$BQSR_DB_DIR" https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz
 else
-    log "File exists, skipping: Mills_and_1000G_gold_standard.indels.hg38.vcf.gz"
+    log "File exists, skipping download for: Mills_and_1000G_gold_standard.indels.hg38.vcf.gz"
 fi
 
 if [[ ! -f "$BQSR_DB_DIR/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi" ]]; then
     run_cmd wget -P "$BQSR_DB_DIR" https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi
 else
-    log "File exists, skipping: Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi"
+    log "File exists, skipping download for: Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi"
 fi
 
 # getting known indels data
 if [[ ! -f "$BQSR_DB_DIR/Homo_sapiens_assembly38.known_indels.vcf.gz" ]]; then
     run_cmd wget -P "$BQSR_DB_DIR" https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.known_indels.vcf.gz
 else
-    log "File exists, skipping: Homo_sapiens_assembly38.known_indels.vcf.gz"
+    log "File exists, skipping download for: Homo_sapiens_assembly38.known_indels.vcf.gz"
 fi
 
 if [[ ! -f "$BQSR_DB_DIR/Homo_sapiens_assembly38.known_indels.vcf.gz.tbi" ]]; then
     run_cmd wget -P "$BQSR_DB_DIR" https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.known_indels.vcf.gz.tbi
 else
-    log "File exists, skipping: Homo_sapiens_assembly38.known_indels.vcf.gz.tbi"
+    log "File exists, skipping download for: Homo_sapiens_assembly38.known_indels.vcf.gz.tbi"
 fi
 
 # getting dbsnp data
 if [[ ! -f "$BQSR_DB_DIR/Homo_sapiens_assembly38.dbsnp138.vcf" ]]; then
     run_cmd wget -P "$BQSR_DB_DIR" https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf
 else
-    log "File exists, skipping: Homo_sapiens_assembly38.dbsnp138.vcf"
+    log "File exists, skipping download for: Homo_sapiens_assembly38.dbsnp138.vcf"
 fi
 
 if [[ ! -f "$BQSR_DB_DIR/Homo_sapiens_assembly38.dbsnp138.vcf.idx" ]]; then
     run_cmd wget -P "$BQSR_DB_DIR" https://storage.googleapis.com/genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf.idx
 else
-    log "File exists, skipping: Homo_sapiens_assembly38.dbsnp138.vcf.idx"
+    log "File exists, skipping download for: Homo_sapiens_assembly38.dbsnp138.vcf.idx"
 fi
 
 # generating index file for reference fasta (needed for BQSR)
-log "Generating reference FASTA index file"
+log "Generating reference FASTA index file..."
 
 if [[ ! -f "${REFERENCE}.fai" ]]; then
     run_cmd samtools faidx "$REFERENCE"
@@ -100,7 +102,7 @@ else
 fi
 
 # generating dict file for reference fasta (needed for BQSR)
-log "Generating reference FASTA sequence dictionary file"
+log "Generating reference FASTA sequence dictionary file..."
 
 if [[ ! -f "${REFERENCE%.*}.dict" ]]; then
     run_cmd gatk CreateSequenceDictionary -R "$REFERENCE"
@@ -135,6 +137,7 @@ run_cmd rm -f ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.bam
 run_cmd rm -f ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.bai
 run_cmd rm -f ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.sbi
 
-log "Preprocessing complete. Final BAM: ${MAPPED_READS_DIR}/${SAMPLE_NAME}_recal.bam"
+log "Preprocessing complete for $SAMPLE_NAME" 
+log "Final BAM: ${MAPPED_READS_DIR}/${SAMPLE_NAME}_recal.bam"
 
 }

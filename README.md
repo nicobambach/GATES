@@ -81,7 +81,6 @@ gates preprocess \
 
 # Variant Calling
 gates call \
-    --sample-name SAMPLE_ID \
     --tumor-bam preprocessing/mapped_reads/SAMPLE_ID_recal.bam \
     --reference hg38.fa \
     --intervals capture_regions.bed \
@@ -110,7 +109,6 @@ gates preprocess \
 
 # Variant Calling
 gates call \
-    --sample-name SAMPLE_ID \
     --tumor-bam preprocessing/mapped_reads/SAMPLE_ID_TUMOR_recal.bam \
     --normal-bam preprocessing/mapped_reads/SAMPLE_ID_NORMAL_recal.bam \
     --reference hg38.fa \
@@ -132,7 +130,6 @@ gates preprocess \
 
 # Variant Calling
 gates call \
-    --sample-name SAMPLE_ID \
     --tumor-bam preprocessing/mapped_reads/SAMPLE_ID_recal.bam \
     --reference hg38.fa \
     --intervals capture_regions.bed \
@@ -163,7 +160,6 @@ Options:
 Runs the calling pipeline including variant identification and filtering. 
 ```
 Arguments: 
-    -s, --sample-name <string>      sample identifier [REQUIRED]
         --tumor-bam <path>          preprocessed tumor BAM file [REQUIRED]
         --normal-bam <path>         preprocessed normal BAM file [REQUIRED if --mode tumor-normal]
     -r, --reference <path>          reference FASTA file [REQUIRED]
