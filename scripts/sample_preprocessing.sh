@@ -132,6 +132,8 @@ run_cmd gatk ApplyBQSR \
 
 # removing non-recalibrated bam file to save space 
 run_cmd rm -f ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.bam
+run_cmd rm -f ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.bai
+run_cmd rm -f ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.sbi
 
 log "Preprocessing complete. Final BAM: ${MAPPED_READS_DIR}/${SAMPLE_NAME}_recal.bam"
 
