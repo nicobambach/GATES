@@ -55,13 +55,27 @@ conda env create -f environment.yaml
 conda activate gates
 ```
 
-3. **Make scripts executable and add to PATH**:
+3. **Make scripts executable**:
 ```bash
 chmod +x bin/gates scripts/*.sh
 export PATH="$PWD/bin:$PATH"
 ```
 
-4. **Test installation**:
+4. **Add GATES to PATH permanently**
+```bash
+# For zsh shells:
+echo 'export PATH="'$(pwd)'/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+# For bash shells:
+echo 'export PATH="'$(pwd)'/bin:$PATH"' >> ~/.bashrc  
+source ~/.bashrc
+
+# Not sure which shell? Check with:
+echo $SHELL
+```
+
+5. **Test installation**:
 ```bash
 gates --version
 gates --help
