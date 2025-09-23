@@ -3,7 +3,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 # setting log file 
-LOG_FILE="./$(date +%Y-%m-%d_%H-%M-%S)_gates.log"
+LOG_FILE="./$(date +%Y-%m-%d_%H-%M-%S)_gates_${GATES_COMMAND:-unknown}.log"
 
 # run_cmd: silences tool outputs unless VERBOSE=1
 run_cmd() {

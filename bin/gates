@@ -3,7 +3,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 # GATES: GATK Automated Tool for Exome Sequencing 
-VERSION="0.1.0"
+VERSION="1.2.0"
 TOOL_NAME="gates"
 
 # puts conda env path at front of shell search path (necessary for proper use of gnu-getopt)
@@ -16,8 +16,9 @@ GATES: GATK Automated Tool for Exome Sequencing
 Usage: ${TOOL_NAME} <command> [arguments] [options]
 
 Commands:
-  preprocess   run GATK WES preprocessing pipeline (tumor-only or tumor-normal)
-  call         run GATK WES variant-calling pipeline (tumor-only or tumor-normal)
+  preprocess   run preprocessing pipeline
+  call         run variant-calling pipeline (tumor-only, tumor-normal, or germline)
+  annotate     annotate VCF and output formatted TSV with variants
 
 Run ${TOOL_NAME} <command> --help for command-specific options.
 
@@ -38,15 +39,23 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 case "$CMD" in
   preprocess)
+    export GATES_COMMAND="preprocess"
     source "$SCRIPT_DIR/scripts/preprocess.sh"
     preprocess_main "$@"
     ;;
 
   call)
+    export GATES_COMMAND="call"
     source "$SCRIPT_DIR/scripts/call.sh"
     call_main "$@"
     ;;
-  
+
+  annotate)
+    export GATES_COMMAND="annotate"
+    source "$SCRIPT_DIR/scripts/annotate.sh"
+    annotate_main "$@"
+    ;;
+
   --version)
   echo "${TOOL_NAME} v${VERSION}"
   exit 0

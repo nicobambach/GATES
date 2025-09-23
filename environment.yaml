@@ -15,6 +15,8 @@ dependencies:
   - r-gsalib
   - r-reshape
   - r-gplots
+  - ensembl-vep
+  - perl-bioperl
   - grep
   - samtools
   - bcftools

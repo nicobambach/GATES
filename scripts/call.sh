@@ -7,11 +7,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # sourcing helper and mode-specific variant calling scripts
 source "$SCRIPT_DIR/scripts/helper.sh"
-source "$SCRIPT_DIR/scripts/tumor_only_calling.sh"
-source "$SCRIPT_DIR/scripts/tumor_normal_calling.sh"
-source "$SCRIPT_DIR/scripts/germline_calling.sh"
+source "$SCRIPT_DIR/scripts/tumor_only_calling_workflow.sh"
+source "$SCRIPT_DIR/scripts/tumor_normal_calling_workflow.sh"
+source "$SCRIPT_DIR/scripts/germline_calling_workflow.sh"
 
-# function to define preprocess specific command usage
+# function to define call specific command usage
 usage() {
   cat << EOF
 Usage: ${TOOL_NAME} call [arguments] [options]
@@ -36,7 +36,6 @@ VERBOSE=0
 TUMOR_BAM=""
 NORMAL_BAM=""
 MODE=""
-GENOME_VERS="hg38"
 THREADS=1
 REFERENCE=""
 INTERVAL_LIST=""
@@ -75,9 +74,19 @@ if [[ -z "$REFERENCE" ]]; then
   exit 1
 fi
 
+if [[ ! -f "$REFERENCE" ]]; then
+  echo "[ERROR] Reference file does not exist: $REFERENCE"
+  exit 1
+fi
+
 # --intervals
 if [[ -z "$INTERVAL_LIST" ]]; then 
   echo "[ERROR] --intervals is required"
+  exit 1
+fi
+
+if [[ ! -f "$INTERVAL_LIST" ]]; then
+  echo "[ERROR] Interval file does not exist: $INTERVAL_LIST"
   exit 1
 fi
 
@@ -87,10 +96,19 @@ if [[ -z "$TUMOR_BAM" ]]; then
   exit 1
 fi
 
+if [[ ! -f "$TUMOR_BAM" ]]; then
+  echo "[ERROR] Tumor BAM file does not exist: $TUMOR_BAM"
+  exit 1
+fi
+
 # --normal-bam for tumor-normal mode
 if [[ "$MODE" == "tumor-normal" ]]; then
   if [[ -z "$NORMAL_BAM" ]]; then 
     echo "[ERROR] --normal-bam required in tumor-normal mode"
+    exit 1
+  fi
+  if [[ ! -f "$NORMAL_BAM" ]]; then
+    echo "[ERROR] Normal BAM file does not exist: $NORMAL_BAM"
     exit 1
   fi
 fi

@@ -5,9 +5,9 @@ IFS=$'\n\t'
 # getting root directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# sourcing helper and mode-specific pre-processing scripts
+# sourcing helper and pre-processing scripts
 source "$SCRIPT_DIR/scripts/helper.sh"
-source "$SCRIPT_DIR/scripts/sample_preprocessing.sh"
+source "$SCRIPT_DIR/scripts/preprocessing_workflow.sh"
 
 # function to define preprocess specific command usage
 usage() {
@@ -72,15 +72,35 @@ if [[ -z "$REFERENCE" ]]; then
   exit 1
 fi
 
+if [[ ! -f "$REFERENCE" ]]; then
+  echo "[ERROR] Reference file does not exist: $REFERENCE"
+  exit 1
+fi
+
 # --intervals
 if [[ -z "$INTERVAL_LIST" ]]; then 
   echo "[ERROR] --intervals is required"
   exit 1
 fi
 
+if [[ ! -f "$INTERVAL_LIST" ]]; then
+  echo "[ERROR] Interval file does not exist: $INTERVAL_LIST"
+  exit 1
+fi
+
 # --fastq1 and --fastq2
 if [[ -z "$FQ1" || -z "$FQ2" ]]; then
   echo "[ERROR] --fastq1 and --fastq2 are required"
+  exit 1
+fi
+
+if [[ ! -f "$FQ1" ]]; then
+  echo "[ERROR] FASTQ file does not exist: $FQ1"
+  exit 1
+fi
+
+if [[ ! -f "$FQ2" ]]; then
+  echo "[ERROR] FASTQ file does not exist: $FQ2"
   exit 1
 fi
 
