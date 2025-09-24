@@ -58,7 +58,6 @@ conda activate gates
 3. **Make scripts executable**:
 ```bash
 chmod +x bin/gates scripts/*.sh
-export PATH="$PWD/bin:$PATH"
 ```
 
 4. **Add GATES to PATH permanently**
