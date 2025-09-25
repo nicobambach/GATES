@@ -40,6 +40,7 @@ run_cmd vep \
     --pick \
     --variant_class \
     --hgvs \
+    --check_existing \
     --max_af \
     --af_gnomade \
     --af_1kg \
@@ -57,16 +58,16 @@ run_cmd filter_vep \
 # converting filtered VCF to TSV
 if [[ "$MODE" == "tumor-normal" ]]; then
 
-run_cmd bcftools +split-vep -f '%CHROM\t%POS\t%REF\t%ALT\t%SYMBOL\t%VARIANT_CLASS\t%Consequence\t%Feature\t%EXON\t%HGVSc\t%HGVSp\t%cDNA_position\t%Protein_position\t%Amino_acids\t%STRAND\t%SIFT\t%PolyPhen[\t%SAMPLE=%AF\t%SAMPLE=%AD]\n' -HH ${ANNOTATION_VARIANTS_DIR}/${SAMPLE_NAME}_rare_nonsyn_variants.vcf -o ${ANNOTATION_VARIANTS_DIR}/${SAMPLE_NAME}_rare_nonsyn_variants.tsv
+run_cmd bcftools +split-vep -f '%CHROM\t%POS\t%REF\t%ALT\t%SYMBOL\t%VARIANT_CLASS\t%Consequence\t%Feature\t%EXON\t%HGVSc\t%HGVSp\t%cDNA_position\t%Protein_position\t%Amino_acids\t%STRAND\t%SIFT\t%PolyPhen\t%Existing_variation\t%CLIN_SIG[\t%SAMPLE=%AF\t%SAMPLE=%AD]\n' -HH ${ANNOTATION_VARIANTS_DIR}/${SAMPLE_NAME}_rare_nonsyn_variants.vcf -o ${ANNOTATION_VARIANTS_DIR}/${SAMPLE_NAME}_rare_nonsyn_variants.tsv
 
 elif [[ "$MODE" == "germline" ]]; then
 
-run_cmd bcftools +split-vep -f '%CHROM\t%POS\t%REF\t%ALT\t%SYMBOL\t%VARIANT_CLASS\t%Consequence\t%Feature\t%EXON\t%HGVSc\t%HGVSp\t%cDNA_position\t%Protein_position\t%Amino_acids\t%STRAND\t%SIFT\t%PolyPhen\t%INFO/AF[\t%AD]\n' -HH ${ANNOTATION_VARIANTS_DIR}/${SAMPLE_NAME}_rare_nonsyn_variants.vcf -o ${ANNOTATION_VARIANTS_DIR}/${SAMPLE_NAME}_rare_nonsyn_variants.tsv
+run_cmd bcftools +split-vep -f '%CHROM\t%POS\t%REF\t%ALT\t%SYMBOL\t%VARIANT_CLASS\t%Consequence\t%Feature\t%EXON\t%HGVSc\t%HGVSp\t%cDNA_position\t%Protein_position\t%Amino_acids\t%STRAND\t%SIFT\t%PolyPhen\t%Existing_variation\t%CLIN_SIG\t%INFO/AF[\t%AD]\n' -HH ${ANNOTATION_VARIANTS_DIR}/${SAMPLE_NAME}_rare_nonsyn_variants.vcf -o ${ANNOTATION_VARIANTS_DIR}/${SAMPLE_NAME}_rare_nonsyn_variants.tsv
 
 
 elif [[ "$MODE" == "tumor-only" ]]; then
 
-run_cmd bcftools +split-vep -f '%CHROM\t%POS\t%REF\t%ALT\t%SYMBOL\t%VARIANT_CLASS\t%Consequence\t%Feature\t%EXON\t%HGVSc\t%HGVSp\t%cDNA_position\t%Protein_position\t%Amino_acids\t%STRAND\t%SIFT\t%PolyPhen[\t%AF\t%AD]\n' -HH ${ANNOTATION_VARIANTS_DIR}/${SAMPLE_NAME}_rare_nonsyn_variants.vcf -o ${ANNOTATION_VARIANTS_DIR}/${SAMPLE_NAME}_rare_nonsyn_variants.tsv
+run_cmd bcftools +split-vep -f '%CHROM\t%POS\t%REF\t%ALT\t%SYMBOL\t%VARIANT_CLASS\t%Consequence\t%Feature\t%EXON\t%HGVSc\t%HGVSp\t%cDNA_position\t%Protein_position\t%Amino_acids\t%STRAND\t%SIFT\t%PolyPhen\t%Existing_variation\t%CLIN_SIG[\t%AF\t%AD]\n' -HH ${ANNOTATION_VARIANTS_DIR}/${SAMPLE_NAME}_rare_nonsyn_variants.vcf -o ${ANNOTATION_VARIANTS_DIR}/${SAMPLE_NAME}_rare_nonsyn_variants.tsv
 
 fi
 
