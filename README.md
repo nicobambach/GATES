@@ -67,8 +67,8 @@ echo 'export PATH="'$(pwd)'/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 
 # For bash shells:
-echo 'export PATH="'$(pwd)'/bin:$PATH"' >> ~/.bashrc  
-source ~/.bashrc
+echo 'export PATH="'$(pwd)'/bin:$PATH"' >> ~/.bash_profile 
+source ~/.bash_profile
 
 # Not sure which shell? Check with:
 echo $SHELL
