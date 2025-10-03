@@ -52,6 +52,7 @@ run_cmd gatk SelectVariants \
 
 # removing non-filtered combined VCF
 rm -f ${HAPLOTYPECALLER_OUTPUT_DIR}/${SAMPLE_NAME}_variants.vcf.gz
+rm -f ${HAPLOTYPECALLER_OUTPUT_DIR}/${SAMPLE_NAME}_variants.vcf.gz.tbi
 
 #### APPLYING HARD FILTERING TO SNP and INDEL VCF FILES ####
 log "Applying standard hard-filters for SNPs and INDELs..."
