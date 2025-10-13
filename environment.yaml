@@ -6,17 +6,17 @@ channels:
 dependencies:
   - bash>=4.0
   - gatk4
-  - bwa
+  - bwa=0.7.18
   - wget
   - util-linux
-  - gnu-getopt
+  - gnu-getopt=1.1.6
   - r-base
   - r-ggplot2
   - r-gsalib
   - r-reshape
   - r-gplots
-  - ensembl-vep
-  - perl-bioperl
+  - ensembl-vep=114.2
+  - perl-bioperl=1.7.8
   - grep
-  - samtools
-  - bcftools
+  - samtools>=1.21
+  - bcftools=1.21
