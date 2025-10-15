@@ -14,11 +14,28 @@ PREPROCESSING_DIR="./preprocessing"
 BQSR_DB_DIR="$SUPPORTING_FILES_DIR/preprocessing_resources"
 BQSR_OUT_DIR="$PREPROCESSING_DIR/bqsr_output"
 MAPPED_READS_DIR="$PREPROCESSING_DIR/mapped_reads"
+QC_DIR="$PREPROCESSING_DIR/qc"
+TRIMMED_DIR="$PREPROCESSING_DIR/trimmed_reads" 
 
 log "Starting preprocessing for $SAMPLE_NAME"
     
 # making necessary directories
-mkdir -p "$BQSR_DB_DIR" "$BQSR_OUT_DIR" "$MAPPED_READS_DIR"
+mkdir -p "$BQSR_DB_DIR" "$BQSR_OUT_DIR" "$MAPPED_READS_DIR" "$QC_DIR" "$TRIMMED_DIR"
+
+#### FASTP QUALITY CONTROL AND TRIMMING ####
+log "Running QC and adapter trimming..."
+
+run_cmd fastp \
+    -i "$FQ1" \
+    -I "$FQ2" \
+    -o "${TRIMMED_DIR}/${SAMPLE_NAME}_R1_trimmed.fastq.gz" \
+    -O "${TRIMMED_DIR}/${SAMPLE_NAME}_R2_trimmed.fastq.gz" \
+    --thread $THREADS \
+    --detect_adapter_for_pe \
+    --html "${QC_DIR}/${SAMPLE_NAME}_fastp.html"
+
+FQ1="${TRIMMED_DIR}/${SAMPLE_NAME}_R1_trimmed.fastq.gz"
+FQ2="${TRIMMED_DIR}/${SAMPLE_NAME}_R2_trimmed.fastq.gz" 
 
 #### ALIGNING TO REFERENCE ####
 log "Indexing reference..."
@@ -137,7 +154,26 @@ run_cmd rm -f ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.bam
 run_cmd rm -f ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.bam.bai
 run_cmd rm -f ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.bam.sbi
 
+#### COMPILING QC METRICS ####
+log "Compiling additional quality control metrics..."
+
+run_cmd samtools stats ${MAPPED_READS_DIR}/${SAMPLE_NAME}_recal.bam > ${QC_DIR}/${SAMPLE_NAME}_alignment_stats.txt
+run_cmd mosdepth \
+    --threads $THREADS \
+    --by $INTERVAL_LIST \
+    --mapq 20 \
+    --no-per-base \
+    --fast-mode \
+    ${QC_DIR}/${SAMPLE_NAME} \
+    ${MAPPED_READS_DIR}/${SAMPLE_NAME}_recal.bam
+
+run_cmd multiqc ${QC_DIR} -f --outdir ${QC_DIR} \
+    --filename ${SAMPLE_NAME}_multiqc_report.html \
+    --title "QC Report for: ${SAMPLE_NAME}" \
+    --force
+
 log "Preprocessing complete for $SAMPLE_NAME" 
 log "Final BAM: ${MAPPED_READS_DIR}/${SAMPLE_NAME}_recal.bam"
+log "QC reports: ${QC_DIR}"
 
 }
