@@ -6,20 +6,20 @@ channels:
 dependencies:
   - bash>=4.0
   - gatk4
-  - bwa=0.7.18
+  - bwa
   - wget
   - util-linux
-  - gnu-getopt=1.1.6
+  - gnu-getopt
   - r-base
   - r-ggplot2
   - r-gsalib
   - r-reshape
   - r-gplots
   - ensembl-vep=114.2
-  - perl-bioperl=1.7.8
+  - perl-bioperl
   - grep
-  - samtools>=1.21
-  - bcftools=1.21
-  - fastp=1.01
-  - multiqc=1.31
-  - mosdepth=0.3.11
+  - samtools=1.21
+  - bcftools
+  - fastp
+  - multiqc
+  - mosdepth
