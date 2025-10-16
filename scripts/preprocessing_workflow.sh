@@ -32,7 +32,8 @@ run_cmd fastp \
     -O "${TRIMMED_DIR}/${SAMPLE_NAME}_R2_trimmed.fastq.gz" \
     --thread $THREADS \
     --detect_adapter_for_pe \
-    --html "${QC_DIR}/${SAMPLE_NAME}_fastp.html"
+    --html "${QC_DIR}/${SAMPLE_NAME}_fastp.html" \
+    --json "${QC_DIR}/${SAMPLE_NAME}_fastp.json"
 
 FQ1="${TRIMMED_DIR}/${SAMPLE_NAME}_R1_trimmed.fastq.gz"
 FQ2="${TRIMMED_DIR}/${SAMPLE_NAME}_R2_trimmed.fastq.gz" 
