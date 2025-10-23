@@ -137,7 +137,7 @@ run_cmd gatk BaseRecalibrator \
             --known-sites $BQSR_DB_DIR/Homo_sapiens_assembly38.dbsnp138.vcf \
             --known-sites $BQSR_DB_DIR/Homo_sapiens_assembly38.known_indels.vcf.gz \
             --known-sites $BQSR_DB_DIR/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz \
-            --interval-padding 100 \
+            --interval-padding 0 \
             --intervals $INTERVAL_LIST \
             -O ${BQSR_OUT_DIR}/${SAMPLE_NAME}_recal_tbl.table
 
@@ -145,7 +145,7 @@ run_cmd gatk BaseRecalibrator \
 run_cmd gatk ApplyBQSR \
             -I ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.bam  \
             -R $REFERENCE \
-            --interval-padding 100 \
+            --interval-padding 0 \
             --intervals $INTERVAL_LIST \
             --bqsr-recal-file ${BQSR_OUT_DIR}/${SAMPLE_NAME}_recal_tbl.table \
             -O ${MAPPED_READS_DIR}/${SAMPLE_NAME}_recal.bam 

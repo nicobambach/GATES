@@ -69,7 +69,7 @@ run_cmd gatk Mutect2 \
     --germline-resource $MUTECT2_SUPPORTING_FILES_DIR/af-only-gnomad.hg38.vcf.gz \
     --panel-of-normals $MUTECT2_SUPPORTING_FILES_DIR/1000g_pon.hg38.vcf.gz \
     --intervals $INTERVAL_LIST \
-    --interval-padding 100 \
+    --interval-padding 0 \
     --f1r2-tar-gz ${MUTECT2_FILTERING_DIR}/${TUMOR_NAME}_f1r2.tar.gz \
     --native-pair-hmm-threads $THREADS \
     -O ${MUTECT2_OUTPUT_DIR}/${TUMOR_NAME}_variants.vcf.gz
