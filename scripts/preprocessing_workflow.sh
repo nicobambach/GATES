@@ -157,8 +157,12 @@ run_cmd rm -f ${MAPPED_READS_DIR}/${SAMPLE_NAME}_mrkdp.bam.sbi
 
 #### COMPILING QC METRICS ####
 log "Compiling additional quality control metrics..."
+run_stats() {
+    samtools stats ${MAPPED_READS_DIR}/${SAMPLE_NAME}_recal.bam > ${QC_DIR}/${SAMPLE_NAME}_alignment_stats.txt
+    }
+    
+run_cmd run_stats
 
-run_cmd samtools stats ${MAPPED_READS_DIR}/${SAMPLE_NAME}_recal.bam > ${QC_DIR}/${SAMPLE_NAME}_alignment_stats.txt
 run_cmd mosdepth \
     --threads $THREADS \
     --by $INTERVAL_LIST \
